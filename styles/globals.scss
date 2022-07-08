@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "./assets/css/colors.scss";
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.article-img img {
+    width: 100%;
+    max-width: fit-content;  
+}
+
+html,
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $dark-bg;
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1, h2, h3 {
+  color: $dark-mediumgreen;
+}
+
+p, strong, span, label {
+  color: $dark-text;
+}
+
+.app-bg {
+  background-color: $dark-bg;
+}
+
+.card {
+  background-color: $dark-card-bg;
+}
+
+.app-btn {
+  color: $dark-text;
+  background-color: $dark-mediumgreen;
+}
+
+.app-btn:hover {
+  background-color: $dark-green;
+  box-shadow: 0 25px 50px -12px rgba($dark-lightgreen, 0.25);
+}
+
+button:disabled.app-btn,
+button[disabled].app-btn {
+  background-color: rgba($dark-green, 0.5);
+}
+
+@media (min-width: 640px) {
+  main {
+    max-width: none;
+  }
+}
