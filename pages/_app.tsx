@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       console.log(accounts)
     });
   
-    ethereum.on('chainChanged', (chainId) => {
+    ethereum.on('chainChanged', (chainId: string) => {
       console.log(web3.utils.hexToNumber(chainId))
       //window.location.reload();
     });
