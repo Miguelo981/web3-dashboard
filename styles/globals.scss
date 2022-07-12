@@ -51,6 +51,10 @@ p, strong, span, label {
   background-color: $dark-card-bg;
 }
 
+.light-card {
+  background-color: $dark-light-bg;
+}
+
 .app-btn {
   color: $dark-text;
   background-color: $dark-mediumgreen;

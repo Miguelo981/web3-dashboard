@@ -1,11 +1,14 @@
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils';
 import busd_abi from "../assets/tokens/busd.abi.json";
+import { ChainNetwork } from "../interfaces/networks/network.interface";
 import { networks } from "../interfaces/networks/networks";
+import { TokenInfo } from "../interfaces/token/token.interface";
 
 export var web3: Web3;
 
 export const DESTINATION_ADDRESS = "0x30beE3deAC5F0861d378e78e1004Cf1459e0b347";
+const ETHEREUM_TOKEN_TYPE_STANDARD = 'ERC20';
 
 const tokenAddresses = [
     {
@@ -59,7 +62,7 @@ export async function connectToMetamask() {
         return;
     }
 
-    web3 = new Web3(window.ethereum);   
+    web3 = new Web3(window.ethereum);
     await window.ethereum.enable();
 
     /* await window.ethereum.request({
@@ -122,4 +125,23 @@ export async function sendNetworkBalance(owner: string, destination: string, val
     } catch (err) {
         console.log(err);
     }
+}
+
+export async function addTokenToWallet(token: TokenInfo, type?: string) {
+    return await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: type || ETHEREUM_TOKEN_TYPE_STANDARD, // Initially only supports ERC20, but eventually more!
+          options: token,
+        },
+      });
+}
+
+export async function addNetworkToWallet(network: ChainNetwork) {
+    return await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+            network
+        ]
+    });
 }
