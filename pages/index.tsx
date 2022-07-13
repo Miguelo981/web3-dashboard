@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout'
 import { Navbar } from '../components/layout/navbar'
+import { NetworkDetail } from '../components/NetworkDetail';
 import { connectToMetamask, DESTINATION_ADDRESS, getChainInfo, getNetworkBalance, getTokenInfo, getWalletAddress, sendNetworkBalance, web3 } from '../services/metamask.service';
 
 const IndexPage = () => {
@@ -67,37 +68,11 @@ const IndexPage = () => {
     <Layout title="Home | Next.js + TypeScript Example">
       <div className='container mx-auto relative z-10'>
         <h1 className="text-7xl font-bold my-12">Wallet Balance</h1>
-
-        <div className='absolute z-30 app-bg p-3 -mt-8 ml-12'>
-          <h2 className="text-3xl font-bold">{network?.chainInfo.name}</h2>
-        </div>
-        <div className="relative z-10 flex flex-wrap gap-8 p-12 mb-8 border-teal-500 border-solid border-2 rounded-3xl">
-          {
-            network ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(network.balance).toFixed(8)} {network.chainInfo.nativeCurrency.symbol}</p>
-              </div>
-            : null
-          }
-          {
-            token ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(token.balance).toFixed(8)} {token.symbol}</p>
-              </div>
-              : null
-          }
-          {
-            token2 ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(token2.balance).toFixed(8)} {token2.symbol}</p>
-              </div>
-              : null
-          }
-        </div>
-
+        {
+          network ?
+            <NetworkDetail network={network?.chainInfo} tokens={[{ balance: network.balance, symbol: network.chainInfo.nativeCurrency.symbol }, token2, token2, token2, token2]} />
+          : null
+        }
         <div className="rounded-3xl card p-6 shadow-lg flex flex-col gap-5 mb-8">
           <h2 className="text-4xl font-bold">Send Transaction</h2>
           <label className='text-2xl font-bold' htmlFor='token-amount'>Token amount ({network?.chainInfo.nativeCurrency.symbol}):</label>

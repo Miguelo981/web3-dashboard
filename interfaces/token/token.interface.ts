@@ -4,4 +4,5 @@ export interface TokenInfo {
     decimals: string | number;
     address?: string;
     image?: string;
+    balance?: string | number;
 }
