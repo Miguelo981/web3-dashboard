@@ -8,4 +8,11 @@ export interface ChainNetwork {
     nativeCurrency: TokenInfo;
     rpcUrls: string[];
     blockExplorerUrls?: string[];
+    name?: string;
+}
+
+export interface MetamaskNetwork {
+    name: string;
+    balance: string | number;
+    nativeCurrency: TokenInfo;
 }
