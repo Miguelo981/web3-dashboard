@@ -1,10 +1,14 @@
+import { useSelector } from "react-redux";
 import { connectToMetamask } from "../../../services/metamask.service";
+import { getSimplifiedAddress } from "../../../utils/text";
 import { NetworkSearch } from "../../NetworkSearch";
 import { TokenInfokSearch } from "../../TokenInfoSearch";
 
 export const Navbar = ({ title }: any) => {
+    const address: string = useSelector((state: any) => state.address);
+
     const connect = async () => {
-        connectToMetamask()
+        await connectToMetamask();
     }
 
     return (
@@ -22,8 +26,13 @@ export const Navbar = ({ title }: any) => {
                 {/* <button onClick={handleNetworkAdd} className="app-btn rounded-lg py-1 px-8 border-transparent shadow-lg">
                     <strong className="text-2xl">Add</strong>
                 </button> */}
-                <button onClick={connect} className="app-btn rounded-lg py-1 px-8 border-transparent shadow-lg">
-                    <strong className="text-2xl">Connect</strong>
+                <button onClick={connect} className="app-btn rounded-lg py-1 px-8 border-transparent shadow-lg max-w-xs">
+                    {
+                        address ?
+                            <strong className="text-md">{ getSimplifiedAddress(address) }</strong>
+                        :
+                            <strong className="text-2xl">Connect</strong>
+                    }
                 </button>
             </div>
         </div>

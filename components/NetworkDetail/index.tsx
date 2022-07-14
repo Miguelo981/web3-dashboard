@@ -1,8 +1,10 @@
 import { MetamaskNetwork } from "../../interfaces/networks/network.interface";
 import { TokenInfo } from "../../interfaces/token/token.interface";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { removeNetwork } from "../../store/reducers/networks.reducer";
+import 'swiper/css';
 
 type NetworkDetailProps = {
     network: MetamaskNetwork;
@@ -11,6 +13,7 @@ type NetworkDetailProps = {
 
 export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
     const [tokenList, setTokenList] = useState(tokens || []);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const nativeTokenExists = tokens.find(token => network && (network.nativeCurrency?.address === token?.address || network.nativeCurrency?.symbol === token?.symbol));
@@ -28,10 +31,17 @@ export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
         setTokenList([...tokens]);
     }
 
+    const handleRemove = (event) => {
+        dispatch(removeNetwork(network));
+    }
+
     return (
         <>
             <div className='absolute z-30 app-bg p-3 -mt-8 ml-12'>
                 <h2 className="text-3xl font-bold">{network?.name}</h2>
+            </div>
+            <div className='absolute z-30 app-bg p-3 -mt-8 right-10'>
+                <h2 onClick={handleRemove} className="text-3xl font-bold cursor-pointer hover:text-teal-600">X</h2>
             </div>
             <div className="relative z-10 flex flex-wrap gap-8 p-12 mb-8 border-teal-500 border-solid border-2 rounded-3xl">
                 {
