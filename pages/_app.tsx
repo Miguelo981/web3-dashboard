@@ -13,23 +13,16 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const { ethereum } = window;
 
-    ethereum.on('connect', (connectInfo) => {
-
-    });
-    ethereum.on('disconnect', (error) => {
-
-    });
-
-    ethereum.on('accountsChanged', (accounts) => {
+    /* ethereum.on('accountsChanged', (accounts) => {
       console.log(accounts)
-    });
+    }); */
 
-    ethereum.on('chainChanged', (chainId: string) => {
+    /* ethereum.on('chainChanged', (chainId: string) => {
       console.log(web3.utils.hexToNumber(chainId), getChainInfo())
 
       //dispatch(getChainInfo() as any);
       //window.location.reload();
-    });
+    }); */
   })
 
   return (

@@ -37,8 +37,6 @@ export const NetworkSearch = () => {
                 delete newNetwork.blockExplorerUrls;
             }
 
-            console.log(newNetwork)
-
             await addNetworkToWallet(newNetwork);
         } catch (err) {
             console.log(err)
