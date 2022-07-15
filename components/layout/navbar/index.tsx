@@ -1,14 +1,17 @@
-import { useSelector } from "react-redux";
-import { connectToMetamask } from "../../../services/metamask.service";
+import { useDispatch, useSelector } from "react-redux";
+import { connectToMetamask, getWalletAddress } from "../../../services/metamask.service";
+import { addAddress } from "../../../store/reducers/address.reducer";
 import { getSimplifiedAddress } from "../../../utils/text";
 import { NetworkSearch } from "../../NetworkSearch";
 import { TokenInfokSearch } from "../../TokenInfoSearch";
 
 export const Navbar = ({ title }: any) => {
     const address: string = useSelector((state: any) => state.address);
+    const dispatch = useDispatch();
 
     const connect = async () => {
         await connectToMetamask();
+        dispatch(addAddress(await getWalletAddress()));
     }
 
     return (

@@ -5,13 +5,15 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { removeNetwork } from "../../store/reducers/networks.reducer";
 import 'swiper/css';
+import { Spinner } from "../Spinner";
 
 type NetworkDetailProps = {
     network: MetamaskNetwork;
     tokens: TokenInfo[];
+    loading?: boolean;
 }
 
-export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
+export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) => {
     const [tokenList, setTokenList] = useState(tokens || []);
     const dispatch = useDispatch();
 
@@ -27,7 +29,7 @@ export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
     }, [tokenList])
 
     const addToken = (event) => {
-        tokens.push(tokens[2]);
+        tokens.push(tokens[0]);
         setTokenList([...tokens]);
     }
 
@@ -45,19 +47,18 @@ export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
             </div>
             <div className="relative z-10 flex flex-wrap gap-8 p-12 mb-8 border-teal-500 border-solid border-2 rounded-3xl">
                 {
-                    tokenList ?
+                    tokenList && !loading ?
                         <Swiper
+                            className="w-full"
                             spaceBetween={30}
                             slidesPerView={4.5}
-                            onSlideChange={() => console.log('slide change')}
-                            onSwiper={(swiper) => console.log(swiper)}
                         >
                             {
-                                tokenList.map((token) => (
-                                    <SwiperSlide>
+                                tokenList.map((token, index) => (
+                                    <SwiperSlide key={`token-slide-${index}`}>
                                         <div className="rounded-3xl card p-6 shadow-lg max-w-sm h-auto flex flex-col">
                                             <h3 className="text-2xl font-black mb-4 text-start">Total Balance:</h3>
-                                            <p className="text-3xl text-end font-bold">{Number(token?.balance).toFixed(8)} {token?.symbol}</p>
+                                            <p className="text-3xl text-end font-bold">{Number(token?.balance).toFixed(6)} {token?.symbol}</p>
                                         </div>
                                     </SwiperSlide>
                                     )
@@ -69,6 +70,11 @@ export const NetworkDetail = ({ network, tokens }: NetworkDetailProps) => {
                                 </div>
                             </SwiperSlide>
                         </Swiper>
+                        : 
+                        loading ?
+                            <div className="mx-auto">
+                                <Spinner />
+                            </div>
                         : null
                 }
             </div>

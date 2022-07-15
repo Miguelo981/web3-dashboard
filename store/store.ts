@@ -1,5 +1,6 @@
 import networks from './reducers/networks.reducer';
 import address from './reducers/address.reducer';
+import customTokens from './reducers/custom-tokens.reducer';
 import { configureStore } from '@reduxjs/toolkit';
 //import thunk from 'redux-thunk'
 import { persistStore, persistReducer } from "redux-persist";
@@ -14,7 +15,7 @@ export const persistConfig = {
   //transforms: [transformCircular],
 };
 
-const rootReducer = combineReducers({ networks, address})
+const rootReducer = combineReducers({ networks, address, customTokens})
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
