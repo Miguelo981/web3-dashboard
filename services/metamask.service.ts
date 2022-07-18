@@ -4,6 +4,7 @@ import busd_abi from "../assets/tokens/busd.abi.json";
 import { ChainNetwork } from "../interfaces/networks/network.interface";
 import { networks } from "../interfaces/networks/networks";
 import { TokenInfo } from "../interfaces/token/token.interface";
+import tokenList from "../assets/tokens/tokens.json";
 
 export var web3: Web3;
 
@@ -75,8 +76,12 @@ export async function connectToMetamask() {
     }
 }
 
+export function disconnectWallet() {
+    web3 = undefined;
+}
+
 export async function getNetworkBalance() {
-    if (!web3) return;
+    if (!web3) return { weiBalance: 0, balance: 0 };
 
     try {
         const address = await getWalletAddress();
@@ -91,15 +96,15 @@ export async function getNetworkBalance() {
     }
 }
 
-export async function getTokenInfo(tokenAddress: string) {
+export async function getTokenInfo(tokenAddress: string): Promise<TokenInfo> {
     if (!web3) return;
 
     try {
-        const token = { weiBalance: "", balance: "", name: "", symbol: "" }
+        const token: TokenInfo = { weiBalance: "", balance: "", name: "", symbol: "", decimals: "", address: tokenAddress }
         const tokenContract = new web3.eth.Contract(busd_abi as AbiItem[], tokenAddress);
 
         token.weiBalance = await tokenContract.methods.balanceOf(await getWalletAddress()).call();
-        token.balance = web3.utils.fromWei(token.weiBalance);
+        token.balance = web3.utils.fromWei(token.weiBalance as any);
         token.name = await tokenContract.methods.name().call();
         token.symbol = await tokenContract.methods.symbol().call();
 
@@ -144,4 +149,19 @@ export async function addNetworkToWallet(network: ChainNetwork) {
             network
         ]
     });
+}
+
+export async function getWalletTokens(customTokens?: TokenInfo[]): Promise<TokenInfo[]> {
+    const availableTokens = [/* ...Object.keys(tokenList).map((key) => tokenList[key]) */, ...customTokens];
+    const tokens = [];
+    
+    for (const token of availableTokens) {
+        const tokenInfo = await getTokenInfo(token.address);
+        
+        if (!tokenInfo) continue;
+
+        tokens.push(tokenInfo);
+    }
+
+    return tokens;
 }

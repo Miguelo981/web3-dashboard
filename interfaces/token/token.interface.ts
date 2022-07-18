@@ -5,4 +5,5 @@ export interface TokenInfo {
     address?: string;
     image?: string;
     balance?: string | number;
+    weiBalance?: string | number;
 }

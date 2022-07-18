@@ -70,8 +70,35 @@ button[disabled].app-btn {
   background-color: rgba($dark-green, 0.5);
 }
 
+.loader {
+  border: 10px solid $dark-card-bg;
+  border-top: 10px solid $dark-mediumgreen;;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+
 @media (min-width: 640px) {
   main {
     max-width: none;
   }
+}
+
+.ReactModal__Overlay {
+  z-index: 31;
+}
+
+.ReactModal__Content {
+  background: $dark-card-bg !important;
+  border-color: transparent !important //$dark-mediumgreen !important;
 }

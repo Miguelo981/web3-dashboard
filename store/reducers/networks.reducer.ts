@@ -12,6 +12,16 @@ export const networkSlice = createSlice({
 
       state.push(action.payload);
     },
+    updateNetwork: (state, action: PayloadAction<MetamaskNetwork>) => {
+      const network = state.find(network => network.chainId === action.payload.chainId);
+
+      if (!network) return;
+
+      const index = state.indexOf(network);
+      state[index] = action.payload;
+
+      return state;
+    },
     setNetworks: (state, action: PayloadAction<MetamaskNetwork[]>) => {
       state = action.payload;
     },
@@ -25,6 +35,6 @@ export const networkSlice = createSlice({
   },
 })
 
-export const { setNetworks, removeNetwork, addNetwork } = networkSlice.actions
+export const { setNetworks, removeNetwork, addNetwork, updateNetwork } = networkSlice.actions
 
 export default networkSlice.reducer
