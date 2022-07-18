@@ -125,7 +125,7 @@ const IndexPage = () => {
             )
             : <div className="flex flex-col w-full m-auto items-center p-12 border-teal-500 border-solid border-2 rounded-3xl">
                 <h3 className="text-3xl mb-8 font-light">Connect to load all your networks</h3>
-                <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg max-w-xs" onClick={connect}>
+                <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg" onClick={connect}>
                   <strong className="text-5xl">Connect</strong>
                 </button>
               </div>

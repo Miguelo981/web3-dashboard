@@ -93,3 +93,12 @@ button[disabled].app-btn {
     max-width: none;
   }
 }
+
+.ReactModal__Overlay {
+  z-index: 31;
+}
+
+.ReactModal__Content {
+  background: $dark-card-bg !important;
+  border-color: transparent !important //$dark-mediumgreen !important;
+}

@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { removeNetwork } from "../../store/reducers/networks.reducer";
 import 'swiper/css';
 import { Spinner } from "../Spinner";
+import { TokenModal } from "../modals/TokenModal";
 
 type NetworkDetailProps = {
     network: MetamaskNetwork;
@@ -15,6 +16,7 @@ type NetworkDetailProps = {
 
 export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) => {
     const [tokenList, setTokenList] = useState(tokens || []);
+    const [modalShow, setModalShow] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -31,14 +33,20 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
     const addToken = (event) => {
         tokens.push(tokens[0]);
         setTokenList([...tokens]);
+        setModalShow(true);
     }
 
     const handleRemove = (event) => {
         dispatch(removeNetwork(network));
     }
 
+    const handleModalClose = () => {
+        setModalShow(false);
+    }
+
     return (
         <>
+            <TokenModal show={modalShow} closeEvent={handleModalClose} />
             <div className='absolute z-30 app-bg p-3 -mt-8 ml-12'>
                 <h2 className="text-3xl font-bold">{network?.name}</h2>
             </div>
