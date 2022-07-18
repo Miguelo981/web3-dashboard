@@ -18,9 +18,8 @@ export const networkSlice = createSlice({
       if (!network) return;
 
       const index = state.indexOf(network);
-
       state[index] = action.payload;
-      
+
       return state;
     },
     setNetworks: (state, action: PayloadAction<MetamaskNetwork[]>) => {

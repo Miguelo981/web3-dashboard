@@ -100,11 +100,11 @@ export async function getTokenInfo(tokenAddress: string): Promise<TokenInfo> {
     if (!web3) return;
 
     try {
-        const token = { weiBalance: "", balance: "", name: "", symbol: "", decimals: "" }
+        const token: TokenInfo = { weiBalance: "", balance: "", name: "", symbol: "", decimals: "", address: tokenAddress }
         const tokenContract = new web3.eth.Contract(busd_abi as AbiItem[], tokenAddress);
 
         token.weiBalance = await tokenContract.methods.balanceOf(await getWalletAddress()).call();
-        token.balance = web3.utils.fromWei(token.weiBalance);
+        token.balance = web3.utils.fromWei(token.weiBalance as any);
         token.name = await tokenContract.methods.name().call();
         token.symbol = await tokenContract.methods.symbol().call();
 
@@ -152,7 +152,7 @@ export async function addNetworkToWallet(network: ChainNetwork) {
 }
 
 export async function getWalletTokens(customTokens?: TokenInfo[]): Promise<TokenInfo[]> {
-    const availableTokens = [/* ...Object.keys(tokenList).map((key) => tokenList[key]) */, ...customTokens || [tokenAddresses[0], tokenAddresses[1], tokenAddresses[2], tokenAddresses[3]]];
+    const availableTokens = [/* ...Object.keys(tokenList).map((key) => tokenList[key]) */, ...customTokens];
     const tokens = [];
     
     for (const token of availableTokens) {

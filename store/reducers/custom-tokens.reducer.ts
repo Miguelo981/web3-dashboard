@@ -16,7 +16,7 @@ export const customTokensSlice = createSlice({
       state = action.payload;
     },
     removeCustomToken: (state, action: PayloadAction<TokenInfo>) => {
-      const customTokens = state.find(customTokens => customTokens.address === action.payload.address);
+      const customTokens = state.find(customTokens => customTokens.symbol === action.payload.symbol); //.address
 
       if (!customTokens) return;
 

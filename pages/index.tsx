@@ -13,14 +13,14 @@ import { addNetwork, updateNetwork } from '../store/reducers/networks.reducer';
 const IndexPage = () => {
   const networks: MetamaskNetwork[] = useSelector((state: any) => state.networks);
   const address: string = useSelector((state: any) => state.address);
-  const customTokens: TokenInfo[] = useSelector((state: any) => state["custom-tokens"]);
+  const customTokens: TokenInfo[] = useSelector((state: any) => state.customTokens);
   const [network, setNetwork] = useState(undefined);
   const [isLoading, setLoading] = useState(networks.map(net => { return { status: false, chainId: net.chainId } }))
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const getToken = async () => {
+    const start = async () => {
       await connectToMetamask();
 
       dispatch(addAddress(await getWalletAddress()));
@@ -89,7 +89,7 @@ const IndexPage = () => {
       });
     }
 
-    getToken();
+    start();
   }, [])
 
   useEffect(() => {
@@ -118,13 +118,13 @@ const IndexPage = () => {
           network && networks && isLoading.length > 0 ?
             networks.map((network: MetamaskNetwork, index) =>
               (
-                <div className='mb-20'>
-                  <NetworkDetail network={network} loading={isLoading[index]?.status} tokens={[{ balance: network.balance, symbol: network.nativeCurrency.symbol, decimals: "18" }, ...network.tokens]} />
+                <div className='mb-20' key={`nets-${index}`}>
+                  <NetworkDetail network={network} loading={isLoading[index]?.status} tokens={[/* { balance: network.balance, symbol: network.nativeCurrency.symbol, decimals: "18" },  */...network.tokens]} />
                 </div>
               )
             )
-            : <div className="flex flex-col w-full m-auto items-center p-12 border-teal-500 border-solid border-2 rounded-3xl">
-                <h3 className="text-3xl mb-8 font-light">Connect to load all your networks</h3>
+            : <div className="flex flex-col w-full m-auto items-center p-12 border-teal-500 border-solid border-2 rounded-3xl mb-12">
+                <h3 className="text-3xl mb-8 font-light">{ networks?.length < 1 ? "Change the Network to load their data" : "Connect to load all your networks"}</h3>
                 <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg" onClick={connect}>
                   <strong className="text-5xl">Connect</strong>
                 </button>
