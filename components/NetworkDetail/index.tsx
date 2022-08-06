@@ -11,6 +11,7 @@ import { addNetworkToWallet, changeToMainNet, web3 } from "../../services/metama
 import { removeCustomToken } from "../../store/reducers/custom-tokens.reducer";
 import useWindowDimensions from "../../hooks/useWindowDimensions";
 import { networks } from "../../interfaces/networks/networks";
+import { useSnackbar } from 'react-simple-snackbar';
 
 type NetworkDetailProps = {
     network: MetamaskNetwork;
@@ -19,6 +20,7 @@ type NetworkDetailProps = {
 }
 
 export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) => {
+    const [openSnackbar, closeSnackbar] = useSnackbar({ duration: 2000, position: 'top-right' })
     const [tokenList, setTokenList] = useState(tokens || []);
     const [modalShow, setModalShow] = useState(false);
     const { height, width } = useWindowDimensions();
@@ -48,6 +50,7 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
 
     const handleRemove = (event) => {
         dispatch(removeNetwork(network));
+        openSnackbar("Network removed successfully");
     }
 
     const handleModalClose = () => {
@@ -55,11 +58,15 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
     }
 
     const handleTokenAdded = (token: TokenInfo, exists: boolean) => {
-        if (!exists) return;
+        if (!exists) {
+            openSnackbar("Token doesn't belong to the actual network");
+            return;
+        }
 
         tokens.push(token);
         dispatch(updateNetwork({ tokens: tokens, balance: network.balance, name: network.name, nativeCurrency: network.nativeCurrency, chainId: network.chainId }));
         setTokenList([...tokens]);
+        openSnackbar("Token added successfully");
     }
 
     const handleRemoveToken = (token: TokenInfo) => {
@@ -69,9 +76,9 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
 
         tokens.splice(index, 1);
         dispatch(removeCustomToken(token));
-        setTokenList([...tokens]);
         dispatch(updateNetwork({ tokens: tokens, balance: network.balance, name: network.name, nativeCurrency: network.nativeCurrency, chainId: network.chainId }));
-        console.log(tokens)
+        setTokenList([...tokens]);
+        openSnackbar("Token removed successfully");
     }
 
     const changeNetwork = async () => {
@@ -80,6 +87,7 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
 
             if (network.chainId === 1) {
                 await changeToMainNet();
+                openSnackbar("Network changed successfully");
                 return;
             }
 
@@ -98,6 +106,7 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
             }
 
             await addNetworkToWallet(net);
+            openSnackbar("Network changed successfully");
         } catch (err) {
             console.log(err)
             /* setError(err.message); */

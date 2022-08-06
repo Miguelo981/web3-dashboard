@@ -1,14 +1,16 @@
 import { useDispatch, useSelector } from "react-redux";
 import { ChainNetwork } from "../../../interfaces/networks/network.interface";
 import { TokenInfo } from "../../../interfaces/token/token.interface";
-import { addNetworkToWallet, addTokenToWallet, connectToMetamask, getWalletAddress, web3 } from "../../../services/metamask.service";
+import { addNetworkToWallet, addTokenToWallet, changeToMainNet, connectToMetamask, getWalletAddress, web3 } from "../../../services/metamask.service";
 import { setAddress } from "../../../store/reducers/address.reducer";
 import { getSimplifiedAddress } from "../../../utils/text";
 import { NetworkSearch } from "../../NetworkSearch";
 import { TokenInfokSearch } from "../../TokenInfoSearch";
 import { networks } from "../../../interfaces/networks/networks";
+import { useSnackbar } from 'react-simple-snackbar';
 
 export const Navbar = ({ title }: any) => {
+    const [openSnackbar, closeSnackbar] = useSnackbar({ duration: 2000, position: 'top-right' });
     const address: string = useSelector((state: any) => state.address);
     const dispatch = useDispatch();
 
@@ -33,6 +35,12 @@ export const Navbar = ({ title }: any) => {
         try {
             if (!window.ethereum) throw new Error("No crypto wallet found");
 
+            if (networkId === 1 && Number(window.ethereum.networkVersion) !== networkId) {
+                await changeToMainNet();
+                openSnackbar("Network changed successfully");
+                return;
+            }
+
             const network = networks.find(net => net.chainId === networkId);
 
             if (!network) {
@@ -52,6 +60,7 @@ export const Navbar = ({ title }: any) => {
             }
 
             await addNetworkToWallet(newNetwork);
+            openSnackbar("Network added successfully")
         } catch (err) {
             console.log(err)
             /* setError(err.message); */
