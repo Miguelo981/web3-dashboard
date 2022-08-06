@@ -1,116 +1,152 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Layout from '../components/Layout'
 import { Navbar } from '../components/layout/navbar'
-import { connectToMetamask, DESTINATION_ADDRESS, getChainInfo, getNetworkBalance, getTokenInfo, getWalletAddress, sendNetworkBalance, web3 } from '../services/metamask.service';
+import { NetworkDetail } from '../components/NetworkDetail';
+import { SendTrasaction } from '../components/SendTransaction';
+import { MetamaskNetwork } from '../interfaces/networks/network.interface';
+import { TokenInfo } from '../interfaces/token/token.interface';
+import { connectToMetamask, disconnectWallet, getChainInfo, getChainInfoById, getNetworkBalance, getWalletAddress, getWalletTokens, web3 } from '../services/metamask.service';
+import { setAddress } from '../store/reducers/address.reducer';
+import { addNetwork, updateNetwork } from '../store/reducers/networks.reducer';
 
 const IndexPage = () => {
+  const networks: MetamaskNetwork[] = useSelector((state: any) => state.networks);
+  const address: string = useSelector((state: any) => state.address);
+  const customTokens: TokenInfo[] = useSelector((state: any) => state.customTokens);
   const [network, setNetwork] = useState(undefined);
-  const [token, setToken] = useState(undefined);
-  const [token2, setToken2] = useState(undefined);
-  const [amount, setAmount] = useState("0");
-  const [destinationAddress, setDestinationAddress] = useState(DESTINATION_ADDRESS);
-  const [validAddress, setValidAddress] = useState(true);
-  let currencyAmout = 4560;
-  let currencySymbol = "€";
-  let cryptoCurrencyAmount = 1.51354;
-  let selectedCryptoCurrency = "ETH";
+  const [isLoading, setLoading] = useState(networks.map(net => { return { status: false, chainId: net.chainId } }))
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const getToken = async () => {
+    const start = async () => {
       await connectToMetamask();
+
+      dispatch(setAddress(await getWalletAddress()));
+
       const chainInfo = getChainInfo();
       const { balance } = await getNetworkBalance();
 
       setNetwork({ balance, chainInfo });
+      dispatch(addNetwork({ tokens: [], balance: balance, name: chainInfo.name, nativeCurrency: chainInfo.nativeCurrency, chainId: chainInfo.chainId }));
 
-      const t = await getTokenInfo('0x78867BbEeF44f2326bF8DDd1941a4439382EF2A7'/* '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56' */);
+      const { ethereum } = window;
 
-      if (t) setToken(t);
+      /* ethereum.on('disconnect', (error) => {
+        dispatch(setAddress(null));
+      }); */
 
-      const t2 = await getTokenInfo('0xEB58343b36C7528F23CAAe63a150240241310049');
+      ethereum.on('accountsChanged', (accounts: string[]) => {
+        console.log(accounts.length)
+        if (accounts.length < 1) {
+          setNetwork(undefined);
+          dispatch(setAddress(null));
+          disconnectWallet()
 
-      if (t2) setToken2(t2);
+          return;
+        }
+      });
+
+      ethereum.on('chainChanged', async (chainId: string) => {
+        if (!web3) return;
+
+        const chainInfo = getChainInfoById(web3.utils.hexToNumber(chainId));
+        const { balance } = await getNetworkBalance();
+
+        const chainLoading = { status: false, chainId: Number(chainId) }
+
+        const index = isLoading.indexOf(chainLoading);
+
+        if (index === -1) {
+          isLoading.push(chainLoading);
+        }
+
+        setLoading(isLoading
+          .map(net => {
+            if (Number(net.chainId) === Number(chainId)) {
+              net.status = true;
+            }
+
+            return net;
+          })
+        );
+
+        dispatch(addNetwork({ tokens: [], balance: balance, name: chainInfo.name, nativeCurrency: chainInfo.nativeCurrency, chainId: chainInfo.chainId }));
+
+        const tokens = await getWalletTokens(customTokens);
+
+        setLoading(isLoading
+          .map(net => {
+            if (Number(net.chainId) === Number(chainId)) {
+              net.status = false;
+            }
+
+            return net;
+          })
+        );
+
+        dispatch(updateNetwork({ tokens: tokens, balance: balance, name: chainInfo.name, nativeCurrency: chainInfo.nativeCurrency, chainId: chainInfo.chainId }));
+      });
     }
 
-    getToken();
+    start();
   }, [])
 
-  const handleAmountInput = (event) => {
-    const value = Number(event.target.value);
+  useEffect(() => {
+    setConnectionValues();
+  }, [address])
 
-    if (value > network?.balance) {
-      setAmount(network?.balance);
-      return;
-    }
+  const setConnectionValues = async () => {
+    const chainInfo = getChainInfo();
+    const { balance } = await getNetworkBalance();
 
-    setAmount(value.toString());
+    if (balance === 0) return;
+
+    setNetwork({ balance, chainInfo });
   }
 
-  const handleMaxAmount = (event) => {
-    setAmount(network?.balance);
+  const connect = async () => {
+    await connectToMetamask();
+    dispatch(setAddress(await getWalletAddress()));
   }
 
-  const handleSendClick = () => {
-    if (destinationAddress === '' || amount === '0') return;
-
-    getWalletAddress().then(address => sendNetworkBalance(address, destinationAddress, amount));
-  }
-
-  const handleAddressInput = (event) => {
-    const address = event.target.value;
-
-    setValidAddress(web3.utils.isAddress(address));
-    setDestinationAddress(address);
+  const handleAddNetwork = () => {
+    
   }
 
   return (
     <Layout title="Home | Next.js + TypeScript Example">
-      <div className='container mx-auto relative z-10'>
-        <h1 className="text-7xl font-bold my-12">Wallet Balance</h1>
-
-        <div className='absolute z-30 app-bg p-3 -mt-8 ml-12'>
-          <h2 className="text-3xl font-bold">{network?.chainInfo.name}</h2>
-        </div>
-        <div className="relative z-10 flex flex-wrap gap-8 p-12 mb-8 border-teal-500 border-solid border-2 rounded-3xl">
-          {
-            network ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(network.balance).toFixed(8)} {network.chainInfo.nativeCurrency.symbol}</p>
-              </div>
+      <div className='md:container px-4 md:px-0 mx-auto relative z-10'>
+        <h2 className="text-4xl md:text-7xl font-bold my-12">Network list</h2>
+        {
+          network && networks && isLoading.length > 0 ?
+            <>
+              {
+                networks.map((network: MetamaskNetwork, index) =>
+                (
+                  <div className='mb-20' key={`nets-${index}`}>
+                    <NetworkDetail network={network} loading={isLoading[index]?.status} tokens={[/* { balance: network.balance, symbol: network.nativeCurrency.symbol, decimals: "18" },  */...network.tokens]} />
+                  </div>
+                )
+                )
+              }
+              {/* <div className="rounded-3xl p-4 md:p-6 max-w-xs h-auto">
+                <h2 onClick={handleAddNetwork} className="text-xl md:text-3xl font-bold cursor-pointer hover:text-teal-600">+</h2>
+              </div> */}
+            </>
+            : <div className="flex flex-col w-full m-auto items-center p-12 border-teal-500 border-solid border-2 rounded-3xl mb-12">
+              <h3 className="text-3xl mb-8 font-light">{networks?.length < 1 ? "Change the Network to load their data" : "Connect to load all your networks"}</h3>
+              <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg" onClick={connect}>
+                <strong className="text-5xl">Connect</strong>
+              </button>
+            </div>
+        }
+        {
+          network ?
+            <SendTrasaction />
             : null
-          }
-          {
-            token ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(token.balance).toFixed(8)} {token.symbol}</p>
-              </div>
-              : null
-          }
-          {
-            token2 ?
-              <div className="rounded-3xl card p-6 shadow-lg w-96 h-auto flex flex-col">
-                <h3 className="text-3xl font-black mb-4 text-start">Total Balance:</h3>
-                <p className="text-4xl text-end font-bold">{Number(token2.balance).toFixed(8)} {token2.symbol}</p>
-              </div>
-              : null
-          }
-        </div>
-
-        <div className="rounded-3xl card p-6 shadow-lg flex flex-col gap-5 mb-8">
-          <h2 className="text-4xl font-bold">Send Transaction</h2>
-          <label className='text-2xl font-bold' htmlFor='token-amount'>Token amount ({network?.chainInfo.nativeCurrency.symbol}):</label>
-          <div className="flex gap-4 w-full">
-            <input name="" className='w-full p-2 rounded-xl' type="text" onChange={handleAmountInput} value={amount} />
-            <button onClick={handleMaxAmount} className='app-btn p-2 px-5 rounded-xl font-bold'>Max</button>
-          </div>
-          <label className='text-2xl font-bold' htmlFor='destination-address'>Destination:</label>
-          <input name='destination-address' type="text" onChange={handleAddressInput} className="p-2 rounded-xl" value={destinationAddress} />
-          { !validAddress ? <small className='text-red-500'>This address is invalid</small> : null }
-          {/* <hr className="my-4" /> */}
-          <button onClick={handleSendClick} disabled={!validAddress || Number(amount) <= 0} className='app-btn h-11 rounded-xl font-bold'>Send {network?.chainInfo.nativeCurrency.symbol}</button>
-        </div>
+        }
       </div>
     </Layout>
   )

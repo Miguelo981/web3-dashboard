@@ -1,29 +1,11 @@
 import '../styles/globals.scss';
 import type { AppProps } from 'next/app'
-import { useEffect } from 'react';
-import { web3 } from '../services/metamask.service';
+import { Provider } from 'react-redux';
+import { store, persistor } from '../store/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import SnackbarProvider from 'react-simple-snackbar';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    const { ethereum } = window;
-
-    ethereum.on('connect', (connectInfo) => {
-
-    });
-    ethereum.on('disconnect', (error) => {
-
-    });
-
-    ethereum.on('accountsChanged', (accounts) => {
-      console.log(accounts)
-    });
-  
-    ethereum.on('chainChanged', (chainId) => {
-      console.log(web3.utils.hexToNumber(chainId))
-      //window.location.reload();
-    });
-  })
-
   return (
     <>
       {/* <Head>
@@ -32,7 +14,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin='' />
           <link href='https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap' rel="stylesheet" />
         </Head> */}
-      <Component {...pageProps} />
+        <SnackbarProvider>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              <Component {...pageProps} />
+            </PersistGate>
+          </Provider>
+        </SnackbarProvider>
     </>
   )
 }
