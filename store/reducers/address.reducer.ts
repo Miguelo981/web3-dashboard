@@ -2,21 +2,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export const addressSlice = createSlice({
   name: 'address',
-  initialState: "",
+  initialState: null,
   reducers: {
-    addAddress: (state: string, action: PayloadAction<string>) => {
-      state = action.payload;
-
-      return state;
-    },
-    removeAddress: (state: string) => {
-      state = "";
-
-      return state;
+    setAddress: (state: string , action: PayloadAction<string>) => {
+      return action.payload;
     }
   },
 })
 
-export const { addAddress, removeAddress } = addressSlice.actions
+export const { setAddress } = addressSlice.actions
 
 export default addressSlice.reducer

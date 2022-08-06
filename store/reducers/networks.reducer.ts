@@ -8,14 +8,14 @@ export const networkSlice = createSlice({
     addNetwork: (state, action: PayloadAction<MetamaskNetwork>) => {
       const network = state.find(network => network.chainId === action.payload.chainId);
 
-      if (network) return;
+      if (network) return state;
 
       state.push(action.payload);
     },
     updateNetwork: (state, action: PayloadAction<MetamaskNetwork>) => {
       const network = state.find(network => network.chainId === action.payload.chainId);
 
-      if (!network) return;
+      if (!network) return state;
 
       const index = state.indexOf(network);
       state[index] = action.payload;

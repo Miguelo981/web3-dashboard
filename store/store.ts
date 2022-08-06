@@ -1,7 +1,7 @@
 import networks from './reducers/networks.reducer';
 import address from './reducers/address.reducer';
 import customTokens from './reducers/custom-tokens.reducer';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 //import thunk from 'redux-thunk'
 import { persistStore, persistReducer } from "redux-persist";
 import { combineReducers } from "redux"
@@ -20,6 +20,9 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = configureStore({
   reducer: persistedReducer,
+  middleware: getDefaultMiddleware({
+    serializableCheck: false
+  })
   //middleware: [thunk/* , logger */]
 });
 

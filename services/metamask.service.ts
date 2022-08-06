@@ -151,6 +151,13 @@ export async function addNetworkToWallet(network: ChainNetwork) {
     });
 }
 
+export async function changeToMainNet() {
+    return await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1' }],
+     })
+}
+
 export async function getWalletTokens(customTokens?: TokenInfo[]): Promise<TokenInfo[]> {
     const availableTokens = [/* ...Object.keys(tokenList).map((key) => tokenList[key]) */, ...customTokens];
     const tokens = [];
