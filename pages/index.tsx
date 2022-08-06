@@ -6,7 +6,7 @@ import { NetworkDetail } from '../components/NetworkDetail';
 import { SendTrasaction } from '../components/SendTransaction';
 import { MetamaskNetwork } from '../interfaces/networks/network.interface';
 import { TokenInfo } from '../interfaces/token/token.interface';
-import { changeNetworkController, connectToMetamask, disconnectWallet, getChainInfo, getChainInfoById, getNetworkBalance, getTokenInfo, getWalletAddress, getWalletTokens, web3 } from '../services/metamask.service';
+import { connectToMetamask, disconnectWallet, getChainInfo, getChainInfoById, getNetworkBalance, getWalletAddress, getWalletTokens, web3 } from '../services/metamask.service';
 import { setAddress } from '../store/reducers/address.reducer';
 import { addNetwork, updateNetwork } from '../store/reducers/networks.reducer';
 
