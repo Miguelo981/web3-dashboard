@@ -6,8 +6,8 @@ import { NetworkDetail } from '../components/NetworkDetail';
 import { SendTrasaction } from '../components/SendTransaction';
 import { MetamaskNetwork } from '../interfaces/networks/network.interface';
 import { TokenInfo } from '../interfaces/token/token.interface';
-import { connectToMetamask, disconnectWallet, getChainInfo, getChainInfoById, getNetworkBalance, getTokenInfo, getWalletAddress, getWalletTokens, web3 } from '../services/metamask.service';
-import { addAddress, removeAddress } from '../store/reducers/address.reducer';
+import { changeNetworkController, connectToMetamask, disconnectWallet, getChainInfo, getChainInfoById, getNetworkBalance, getTokenInfo, getWalletAddress, getWalletTokens, web3 } from '../services/metamask.service';
+import { setAddress } from '../store/reducers/address.reducer';
 import { addNetwork, updateNetwork } from '../store/reducers/networks.reducer';
 
 const IndexPage = () => {
@@ -23,7 +23,7 @@ const IndexPage = () => {
     const start = async () => {
       await connectToMetamask();
 
-      dispatch(addAddress(await getWalletAddress()));
+      dispatch(setAddress(await getWalletAddress()));
 
       const chainInfo = getChainInfo();
       const { balance } = await getNetworkBalance();
@@ -34,13 +34,14 @@ const IndexPage = () => {
       const { ethereum } = window;
 
       /* ethereum.on('disconnect', (error) => {
-        dispatch(removeAddress());
+        dispatch(setAddress(null));
       }); */
 
       ethereum.on('accountsChanged', (accounts: string[]) => {
+        console.log(accounts.length)
         if (accounts.length < 1) {
           setNetwork(undefined);
-          dispatch(removeAddress());
+          dispatch(setAddress(null));
           disconnectWallet()
 
           return;
@@ -63,7 +64,7 @@ const IndexPage = () => {
 
         setLoading(isLoading
           .map(net => {
-            if (Number(net.chainId) === Number(chainId)) { 
+            if (Number(net.chainId) === Number(chainId)) {
               net.status = true;
             }
 
@@ -77,8 +78,8 @@ const IndexPage = () => {
 
         setLoading(isLoading
           .map(net => {
-            if (Number(net.chainId) === Number(chainId)) { 
-              net.status = false; 
+            if (Number(net.chainId) === Number(chainId)) {
+              net.status = false;
             }
 
             return net;
@@ -95,7 +96,7 @@ const IndexPage = () => {
   useEffect(() => {
     setConnectionValues();
   }, [address])
-  
+
   const setConnectionValues = async () => {
     const chainInfo = getChainInfo();
     const { balance } = await getNetworkBalance();
@@ -107,33 +108,44 @@ const IndexPage = () => {
 
   const connect = async () => {
     await connectToMetamask();
-    dispatch(addAddress(await getWalletAddress()));
-}
+    dispatch(setAddress(await getWalletAddress()));
+  }
+
+  const handleAddNetwork = () => {
+    
+  }
 
   return (
     <Layout title="Home | Next.js + TypeScript Example">
-      <div className='container mx-auto relative z-10'>
-        <h2 className="text-7xl font-bold my-12">Network list</h2>
+      <div className='md:container px-4 md:px-0 mx-auto relative z-10'>
+        <h2 className="text-4xl md:text-7xl font-bold my-12">Network list</h2>
         {
           network && networks && isLoading.length > 0 ?
-            networks.map((network: MetamaskNetwork, index) =>
-              (
-                <div className='mb-20' key={`nets-${index}`}>
-                  <NetworkDetail network={network} loading={isLoading[index]?.status} tokens={[/* { balance: network.balance, symbol: network.nativeCurrency.symbol, decimals: "18" },  */...network.tokens]} />
-                </div>
-              )
-            )
+            <>
+              {
+                networks.map((network: MetamaskNetwork, index) =>
+                (
+                  <div className='mb-20' key={`nets-${index}`}>
+                    <NetworkDetail network={network} loading={isLoading[index]?.status} tokens={[/* { balance: network.balance, symbol: network.nativeCurrency.symbol, decimals: "18" },  */...network.tokens]} />
+                  </div>
+                )
+                )
+              }
+              {/* <div className="rounded-3xl p-4 md:p-6 max-w-xs h-auto">
+                <h2 onClick={handleAddNetwork} className="text-xl md:text-3xl font-bold cursor-pointer hover:text-teal-600">+</h2>
+              </div> */}
+            </>
             : <div className="flex flex-col w-full m-auto items-center p-12 border-teal-500 border-solid border-2 rounded-3xl mb-12">
-                <h3 className="text-3xl mb-8 font-light">{ networks?.length < 1 ? "Change the Network to load their data" : "Connect to load all your networks"}</h3>
-                <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg" onClick={connect}>
-                  <strong className="text-5xl">Connect</strong>
-                </button>
-              </div>
+              <h3 className="text-3xl mb-8 font-light">{networks?.length < 1 ? "Change the Network to load their data" : "Connect to load all your networks"}</h3>
+              <button className="app-btn rounded-lg py-3 px-10 border-transparent shadow-lg" onClick={connect}>
+                <strong className="text-5xl">Connect</strong>
+              </button>
+            </div>
         }
         {
           network ?
             <SendTrasaction />
-          : null
+            : null
         }
       </div>
     </Layout>

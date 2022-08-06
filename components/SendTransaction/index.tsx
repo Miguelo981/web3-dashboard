@@ -8,24 +8,8 @@ export const SendTrasaction = () => {
     const [validAddress, setValidAddress] = useState(true);
 
     useEffect(() => {
-        const getToken = async () => {
-            const chainInfo = getChainInfo();
-            const { balance } = await getNetworkBalance();
-
-            setNetwork({ balance, chainInfo });
-
-            const { ethereum } = window;
-
-            ethereum.on('chainChanged', async (chainId: string) => {
-                const chainInfo = getChainInfoById(web3.utils.hexToNumber(chainId));
-                const { balance } = await getNetworkBalance();
-
-                setNetwork({ balance, chainInfo });
-            });
-        }
-
-        getToken();
-    }, [web3])
+        initWallet();
+    }, [])
 
     const handleAmountInput = (event) => {
         const value = Number(event.target.value);
@@ -36,6 +20,22 @@ export const SendTrasaction = () => {
         }
 
         setAmount(value.toString());
+    }
+
+    const initWallet = async () => {
+        const chainInfo = getChainInfo();
+        const { balance } = await getNetworkBalance();
+
+        setNetwork({ balance, chainInfo });
+
+        const { ethereum } = window;
+
+        ethereum.on('chainChanged', async (chainId: string) => {
+            const chainInfo = getChainInfoById(web3.utils.hexToNumber(chainId));
+            const { balance } = await getNetworkBalance();
+
+            setNetwork({ balance, chainInfo });
+        });
     }
 
     const handleMaxAmount = (event) => {

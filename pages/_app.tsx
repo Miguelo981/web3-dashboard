@@ -1,30 +1,10 @@
 import '../styles/globals.scss';
 import type { AppProps } from 'next/app'
-import { useEffect } from 'react';
-import { getChainInfo, web3 } from '../services/metamask.service';
-import { useDispatch } from 'react-redux';
 import { Provider } from 'react-redux';
 import { store, persistor } from '../store/store';
 import { PersistGate } from 'redux-persist/integration/react';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  //const dispatch = useDispatch();
-
-  useEffect(() => {
-    const { ethereum } = window;
-
-    /* ethereum.on('accountsChanged', (accounts) => {
-      console.log(accounts)
-    }); */
-
-    /* ethereum.on('chainChanged', (chainId: string) => {
-      console.log(web3.utils.hexToNumber(chainId), getChainInfo())
-
-      //dispatch(getChainInfo() as any);
-      //window.location.reload();
-    }); */
-  })
-
   return (
     <>
       {/* <Head>
