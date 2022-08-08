@@ -52,7 +52,7 @@ export const Navbar = ({ title }: any) => {
                 chainName: network.name,
                 nativeCurrency: network.nativeCurrency,
                 rpcUrls: network.rpc,
-                blockExplorerUrls: network.explorers ? network.explorers.map(ex => ex.url) : []
+                blockExplorerUrls: network.explorers ? [...network.explorers].map(ex => ex.url) : []
             }
 
             if (!network.explorers) {

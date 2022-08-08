@@ -102,7 +102,7 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
                 chainName: n.name,
                 nativeCurrency: n.nativeCurrency,
                 rpcUrls: n.rpc,
-                blockExplorerUrls: n.explorers ? n.explorers.map(ex => ex.url) : []
+                blockExplorerUrls: n.explorers ? [...n.explorers].map(ex => ex.url) : []
             }
 
             await addNetworkToWallet(net);
