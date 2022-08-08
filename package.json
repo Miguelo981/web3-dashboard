@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
+    "export": "next export -o _static",
     "start": "next start",
     "type-check": "tsc"
   },
