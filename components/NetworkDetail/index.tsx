@@ -12,7 +12,6 @@ import { removeCustomToken } from "../../store/reducers/custom-tokens.reducer";
 import useWindowDimensions from "../../hooks/useWindowDimensions";
 import { networks } from "../../interfaces/networks/networks";
 import { useSnackbar } from 'react-simple-snackbar';
-import Image from "next/image";
 
 type NetworkDetailProps = {
     network: MetamaskNetwork;
@@ -142,7 +141,7 @@ export const NetworkDetail = ({ network, tokens, loading }: NetworkDetailProps) 
                                         <div className="rounded-3xl card p-4 md:p-6 shadow-lg max-w-sm h-auto flex flex-col">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-md md:text-2xl font-black text-start">Total Balance:</h3>
-                                                <Image onClick={() => {handleRemoveToken(token)}} src="/assets/icons/delete.svg" className="h-4 md:h-5 w-auto cursor-pointer" alt="" />
+                                                <img onClick={() => {handleRemoveToken(token)}} src="/assets/icons/delete.svg" className="h-4 md:h-5 w-auto cursor-pointer" alt="" />
                                             </div>
                                             <p className="text-lg md:text-3xl text-end font-bold">{Number(token?.balance).toFixed(6)} {token?.symbol}</p>
                                         </div>
